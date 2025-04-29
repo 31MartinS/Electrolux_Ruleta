@@ -1,15 +1,24 @@
-import Formulario from '../components/Formulario';
-import backgroundImage from '../assets/images/moms.jpg';  // Asegúrate de que la imagen esté en esta ruta
+import Formulario from '../components/Formulario'
+import backgroundImage from '../assets/images/moms.jpg'
 
 export default function Home() {
   return (
     <div
-      className="flex justify-center items-center min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${backgroundImage})` }}  // Usa la imagen importada
+      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-auto"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
     >
-      <div className=" p-8 rounded-xl max-w-lg w-full">
+      {/* Overlay para contraste */}
+      <div className="absolute inset-0 bg-black/50 z-0"></div>
+
+      {/* Contenido principal */}
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md p-4">
         <Formulario />
       </div>
     </div>
-  );
+  )
 }

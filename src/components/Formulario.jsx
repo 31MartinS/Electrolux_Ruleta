@@ -1,6 +1,5 @@
-// src/components/Formulario.jsx
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'  // Importar useNavigate
+import { useNavigate } from 'react-router-dom'
 import { guardarParticipante } from '../services/firebase'
 import '../styles/form.css'
 
@@ -9,46 +8,85 @@ export default function Formulario() {
     nombre: '', cedula: '', celular: '', email: ''
   })
   const [error, setError] = useState('')
-  const navigate = useNavigate()  // Inicializar useNavigate
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const validarEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
-  const validarCedula = c => /^\d{8,10}$/.test(c)
+  const validarNombre = nombre =>
+    /^([A-Za-zÁÉÍÓÚáéíóúÑñ]{2,})(\s[A-Za-zÁÉÍÓÚáéíóúÑñ]{2,})+$/.test(nombre.trim())
+
+  const validarCedula = cedula =>
+    /^\d{10}$/.test(cedula)
+
+  const validarCelular = celular =>
+    /^09\d{8}$/.test(celular)
+
+  const validarEmail = email =>
+    /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)
 
   const handleSubmit = async e => {
     e.preventDefault()
-    if (!formData.nombre || !formData.cedula || !formData.celular || !formData.email) {
-      return setError('Completa todos los campos.')
+    const { nombre, cedula, celular, email } = formData
+
+    if (!nombre || !cedula || !celular || !email) {
+      return setError('Todos los campos son obligatorios.')
     }
-    if (!validarEmail(formData.email)) {
-      return setError('Email inválido.')
+
+    if (!validarNombre(nombre)) {
+      return setError('Nombre inválido. Usa solo letras y al menos dos palabras.')
     }
-    if (!validarCedula(formData.cedula)) {
-      return setError('Cédula inválida (8–10 dígitos).')
+
+    if (!validarCedula(cedula)) {
+      return setError('La cédula debe tener exactamente 10 dígitos numéricos.')
+    }
+
+    if (!validarCelular(celular)) {
+      return setError('El celular debe tener 10 dígitos y comenzar con 09.')
+    }
+
+    if (!validarEmail(email)) {
+      return setError('Correo electrónico inválido.')
     }
 
     try {
+      setLoading(true)
       await guardarParticipante(formData)
-      sessionStorage.setItem('emailParticipante', formData.email)  // Guarda el email en sessionStorage
-      navigate('/spin')  // Redirigir a la página de la ruleta
+      sessionStorage.setItem('emailParticipante', email)
+      navigate('/spin')
     } catch (err) {
-      setError(err.message || 'Error al guardar.')
+      setError(err.message || 'Error al guardar los datos.')
+      setLoading(false)
     }
   }
 
   const handleChange = e => {
-    setFormData(f => ({ ...f, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    setFormData(f => ({ ...f, [name]: value }))
     setError('')
   }
 
   return (
-    <form className="formulario" onSubmit={handleSubmit}>
-      <h2>¡Bienvenido!</h2>
-      <input name="nombre" placeholder="Nombre" onChange={handleChange} />
-      <input name="cedula" placeholder="Cédula" onChange={handleChange} />
-      <input name="celular" placeholder="Celular" onChange={handleChange} />
-      <input name="email" type="email" placeholder="Email" onChange={handleChange} />
+    <form className="formulario" onSubmit={handleSubmit} noValidate>
+      <h2>¡Participa y gana premios!</h2>
+
+      <label htmlFor="nombre"><strong>Nombre completo</strong></label>
+      <input id="nombre" name="nombre" placeholder="Ej. Juan Pérez" value={formData.nombre} onChange={handleChange} required />
+
+      <label htmlFor="cedula"><strong>Cédula</strong></label>
+      <input id="cedula" name="cedula" placeholder="Ej. 0912345678" value={formData.cedula} onChange={handleChange} required />
+
+      <label htmlFor="celular"><strong>Celular</strong></label>
+      <input id="celular" name="celular" placeholder="Ej. 0998765432" value={formData.celular} onChange={handleChange} required />
+
+      <label htmlFor="email"><strong>Correo electrónico</strong></label>
+      <input id="email" name="email" type="email" placeholder="Ej. correo@ejemplo.com" value={formData.email} onChange={handleChange} required />
+
       {error && <p className="error">{error}</p>}
-      <button type="submit">Continuar</button>
+
+      <button type="submit" disabled={loading}>
+        {loading ? (
+          <span className="spinner"></span>
+        ) : 'Continuar'}
+      </button>
     </form>
   )
 }
