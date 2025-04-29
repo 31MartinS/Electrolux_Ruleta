@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #EAEAE8;
+  --color-primary: #1F2045;
+  --color-secondary: #4B4762;
+  --color-accent: #2F3153;
+  --color-light: #D3DCE1;
+
+  --wheel-color-1: #D3DCE1;
+  --wheel-color-2: #1F2045;
+}
+
+/* Agregar en tu archivo CSS */
+@keyframes gradientAnimation {
+  0% {
+    background: linear-gradient(to right, #4B4762, #2F3153);
+  }
+  50% {
+    background: linear-gradient(to right, #2F3153, #4B4762);
+  }
+  100% {
+    background: linear-gradient(to right, #4B4762, #2F3153);
+  }
+}
+
+.bg-dynamic {
+  animation: gradientAnimation 5s ease infinite;
+}

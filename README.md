@@ -1,18 +1,12 @@
-# 🎁 Ruleta de Premios
+# React + Vite
 
-Este proyecto es una aplicación web interactiva desarrollada con **React** que permite a los usuarios girar una ruleta para ganar premios aleatorios. Está diseñada para ser visualmente atractiva, fácil de usar y personalizable.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 Características
+Currently, two official plugins are available:
 
-- 🎡 Ruleta animada con colores intercalados.
-- 🎁 Premios personalizados (como "Detergente gratis por 6 meses", "Regalo sorpresa", etc.).
-- 🎨 Interfaz atractiva y responsiva.
-- 🔄 Lógica para evitar repeticiones consecutivas si se desea.
-- ✅ Fácil de desplegar con Vercel.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 🧠 Tecnologías utilizadas
+## Expanding the ESLint configuration
 
-- [React](https://reactjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/) (opcional)
-- [Vite](https://vitejs.dev/) o Create React App (dependiendo del setup)
-- [Vercel](https://vercel.com/) para despliegue (opcional)
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
