@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import TitleImg from '../assets/images/Title.png';
+import { asignarPremio } from '../services/firebase';
 
 const premios = [
   "Medio año de detergente gratis",
@@ -29,6 +30,9 @@ export default function SpinWheel() {
 
   const sonidoGiro = useRef(new Audio('/audio/rulet.mp3')).current;
   const sonidoFin = useRef(new Audio('/audio/win.mp3')).current;
+
+  // Recupera el email del participante desde sessionStorage
+  const emailParticipante = sessionStorage.getItem('emailParticipante');
 
   useEffect(() => {
     const mezclados = [...premios].sort(() => Math.random() - 0.5);
@@ -65,12 +69,12 @@ export default function SpinWheel() {
       ctx.strokeStyle = 'white';
       ctx.stroke();
 
-      // Overlay highlight sin borde brillante
+      // Highlight si es el segmento ganador
       if (highlightIndex === i) {
         ctx.save();
         ctx.globalAlpha = 0.3;
-        ctx.fillStyle = 'rgb(255, 69, 0)'; // mismo que #FF4500
-        ctx.shadowColor = 'rgb(255, 140, 0)'; // sombra neón naranja
+        ctx.fillStyle = 'rgb(255, 69, 0)';
+        ctx.shadowColor = 'rgb(255, 140, 0)';
         ctx.shadowBlur = 25;
         ctx.beginPath();
         ctx.moveTo(centro, centro);
@@ -157,6 +161,12 @@ export default function SpinWheel() {
 
         const ctxFinal = canvasRef.current.getContext('2d');
         dibujar(ctxFinal, destino, premiosAsignados, randomIndex);
+
+        // Guardar el premio en Firestore
+        if (emailParticipante) {
+          asignarPremio(emailParticipante, premiosAsignados[randomIndex])
+            .catch(err => console.error('Error al asignar premio:', err));
+        }
       }
     };
 
@@ -173,10 +183,10 @@ export default function SpinWheel() {
 
       <div className="relative flex flex-col items-center bg-white p-8 rounded-3xl shadow-2xl">
 
-        {/* LOGO (sin cambios) */}
-        <img 
+        {/* LOGO */}
+        <img
           src={TitleImg}
-          alt="Logo" 
+          alt="Logo"
           className="w-50 mb-6 absolute top-[-12rem] left-1/2 transform -translate-x-1/2 drop-shadow-lg"
         />
 

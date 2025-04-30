@@ -48,4 +48,4 @@ export async function asignarPremio(email, premio) {
     const participanteRef = doc(db, "participantes", docSnap.id);
     await updateDoc(participanteRef, { premio });
   }
-}
+} 

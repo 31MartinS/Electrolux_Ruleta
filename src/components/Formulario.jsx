@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { guardarParticipante } from '../services/firebase'
 import '../styles/form.css'
+import { asignarPremio } from '../services/firebase';
+const emailParticipante = sessionStorage.getItem('emailParticipante');
+
+
 
 export default function Formulario() {
   const [formData, setFormData] = useState({
