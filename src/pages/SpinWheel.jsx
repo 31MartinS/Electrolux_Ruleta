@@ -31,7 +31,6 @@ export default function SpinWheel() {
   const sonidoGiro = useRef(new Audio('/audio/rulet.mp3')).current;
   const sonidoFin = useRef(new Audio('/audio/win.mp3')).current;
 
-  // Recupera el email del participante desde sessionStorage
   const emailParticipante = sessionStorage.getItem('emailParticipante');
 
   useEffect(() => {
@@ -54,14 +53,12 @@ export default function SpinWheel() {
       const start = i * angSeg;
       const end = (i + 1) * angSeg;
 
-      // Fondo alternado
       ctx.beginPath();
       ctx.moveTo(centro, centro);
       ctx.arc(centro, centro, centro, start, end);
       ctx.fillStyle = colores[i % 2];
       ctx.fill();
 
-      // Borde uniforme
       ctx.beginPath();
       ctx.moveTo(centro, centro);
       ctx.arc(centro, centro, centro, start, end);
@@ -69,7 +66,6 @@ export default function SpinWheel() {
       ctx.strokeStyle = 'white';
       ctx.stroke();
 
-      // Highlight si es el segmento ganador
       if (highlightIndex === i) {
         ctx.save();
         ctx.globalAlpha = 0.3;
@@ -84,7 +80,6 @@ export default function SpinWheel() {
       }
     }
 
-    // Texto de premios
     ctx.save();
     ctx.translate(centro, centro);
     for (let i = 0; i < segmentos; i++) {
@@ -162,7 +157,6 @@ export default function SpinWheel() {
         const ctxFinal = canvasRef.current.getContext('2d');
         dibujar(ctxFinal, destino, premiosAsignados, randomIndex);
 
-        // Guardar el premio en Firestore
         if (emailParticipante) {
           asignarPremio(emailParticipante, premiosAsignados[randomIndex])
             .catch(err => console.error('Error al asignar premio:', err));
@@ -177,17 +171,17 @@ export default function SpinWheel() {
     <div
       ref={containerRef}
       style={{ fontFamily: 'ElectroluxSans_Bold, Electrolux, sans-serif' }}
-      className="flex flex-col items-center justify-start pt-32 min-h-screen bg-dynamic opacity-0 scale-50 transition-all duration-700 ease-out"
+      className="flex flex-col items-center justify-start pt-32 min-h-screen bg-dynamic opacity-0 scale-50 transition-all duration-700 ease-out px-4"
     >
       {confetiVisible && <Confetti />}
 
-      <div className="relative flex flex-col items-center bg-white p-8 rounded-3xl shadow-2xl">
+      <div className="relative flex flex-col items-center bg-white p-8 rounded-3xl shadow-2xl w-full max-w-[500px]">
 
         {/* LOGO */}
         <img
           src={TitleImg}
           alt="Logo"
-          className="w-50 mb-6 absolute top-[-12rem] left-1/2 transform -translate-x-1/2 drop-shadow-lg"
+          className="w-40 sm:w-52 md:w-64 lg:w-72 mb-6 absolute -top-32 sm:-top-48 md:-top-28 lg:-top-32 left-1/2 transform -translate-x-1/2 drop-shadow-lg"
         />
 
         {/* FLECHA */}
@@ -209,14 +203,14 @@ export default function SpinWheel() {
           ref={canvasRef}
           width={400}
           height={400}
-          className="rounded-full shadow-2xl border-8 border-[#2F3153] mt-8"
+          className="w-[90vw] max-w-[400px] aspect-square rounded-full shadow-2xl border-8 border-[#2F3153] mt-8"
         />
 
         {/* MENSAJE GANADOR */}
         {premioTexto && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg text-center z-10">
-            <h2 className="text-3xl font-bold mb-2 text-green-600">¡Felicidades!</h2>
-            <p className="text-lg">{`Has ganado: ${premioTexto}`}</p>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg text-center z-10 max-w-[80%]">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-green-600">¡Felicidades!</h2>
+            <p className="text-base sm:text-lg">{`Has ganado: ${premioTexto}`}</p>
           </div>
         )}
 
@@ -224,7 +218,7 @@ export default function SpinWheel() {
         <button
           onClick={girarRuleta}
           disabled={girando}
-          className="mt-6 px-6 py-3 bg-[var(--color-secondary)] hover:bg-[var(--color-accent)] text-white font-bold rounded-full transition-colors disabled:bg-[var(--color-light)] disabled:cursor-not-allowed"
+          className="mt-6 px-6 py-3 text-sm sm:text-base bg-[var(--color-secondary)] hover:bg-[var(--color-accent)] text-white font-bold rounded-full transition-colors disabled:bg-[var(--color-light)] disabled:cursor-not-allowed"
         >
           {girando ? 'Girando...' : '¡Girar Ruleta!'}
         </button>
