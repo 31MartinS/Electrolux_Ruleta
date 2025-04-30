@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
+import TitleImg from '../assets/images/Title.png';
 
-// Nombres de los premios (sin emojis)
 const premios = [
   "Medio año de detergente gratis",
   "Regalo sorpresa",
@@ -21,18 +21,24 @@ export default function SpinWheel() {
   const [girando, setGirando] = useState(false);
   const [premioTexto, setPremioTexto] = useState('');
   const [confetiVisible, setConfetiVisible] = useState(false);
+  const [premiosAsignados, setPremiosAsignados] = useState([]);
+  const [finalIndex, setFinalIndex] = useState(null);
 
   const segmentos = premios.length;
   const centro = 200;
 
-  // Crear un solo objeto Audio
   const sonidoGiro = useRef(new Audio('/audio/rulet.mp3')).current;
-  const sonidoFin  = useRef(new Audio('/audio/win.mp3')).current;
+  const sonidoFin = useRef(new Audio('/audio/win.mp3')).current;
 
-  // Mezclar premios aleatoriamente
-  const premiosAsignados = [...premios].sort(() => Math.random() - 0.5);
+  useEffect(() => {
+    const mezclados = [...premios].sort(() => Math.random() - 0.5);
+    setPremiosAsignados(mezclados);
+    const ctx = canvasRef.current.getContext('2d');
+    dibujar(ctx, 0, mezclados, null);
+    containerRef.current.classList.remove('opacity-0', 'scale-50');
+  }, []);
 
-  const dibujar = (ctx, angulo) => {
+  const dibujar = (ctx, angulo, premiosActuales, highlightIndex) => {
     const angSeg = (2 * Math.PI) / segmentos;
     ctx.clearRect(0, 0, centro * 2, centro * 2);
     ctx.save();
@@ -40,47 +46,54 @@ export default function SpinWheel() {
     ctx.rotate((angulo * Math.PI) / 180);
     ctx.translate(-centro, -centro);
 
-    const offset = ((angulo % 360) * Math.PI) / 180;
-    const activo = (segmentos - Math.floor((offset / (2 * Math.PI)) * segmentos)) % segmentos;
-
-    // Dibujar segmentos
     for (let i = 0; i < segmentos; i++) {
+      const start = i * angSeg;
+      const end = (i + 1) * angSeg;
+
+      // Fondo alternado
       ctx.beginPath();
       ctx.moveTo(centro, centro);
-      ctx.arc(centro, centro, centro, i * angSeg, (i + 1) * angSeg);
-      ctx.fillStyle = i === activo ? "#7FDBFF" : colores[i % 2];
+      ctx.arc(centro, centro, centro, start, end);
+      ctx.fillStyle = colores[i % 2];
       ctx.fill();
-      ctx.strokeStyle = "white";
+
+      // Borde uniforme
+      ctx.beginPath();
+      ctx.moveTo(centro, centro);
+      ctx.arc(centro, centro, centro, start, end);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'white';
       ctx.stroke();
+
+      // Overlay highlight sin borde brillante
+      if (highlightIndex === i) {
+        ctx.save();
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = 'rgb(255, 69, 0)'; // mismo que #FF4500
+        ctx.shadowColor = 'rgb(255, 140, 0)'; // sombra neón naranja
+        ctx.shadowBlur = 25;
+        ctx.beginPath();
+        ctx.moveTo(centro, centro);
+        ctx.arc(centro, centro, centro, start, end);
+        ctx.fill();
+        ctx.restore();
+      }
     }
 
-    // Dibujar texto de premios con fuente Electrolux y tamaño reducido
+    // Texto de premios
     ctx.save();
     ctx.translate(centro, centro);
     for (let i = 0; i < segmentos; i++) {
       ctx.save();
       const a = i * angSeg + angSeg / 2;
       ctx.rotate(a);
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#fff";
-      // Usar Electrolux
-      ctx.font = "bold 14px Electrolux";
-      
-      const fullText = premiosAsignados[i];
-      let lines = [];
-      if (fullText.length > 14) {
-        const words = fullText.split(' ');
-        let line1 = '', line2 = '';
-        words.forEach(word => {
-          if ((line1 + word).length <= 14) line1 += word + ' ';
-          else line2 += word + ' ';
-        });
-        lines = [line1.trim(), line2.trim()];
-      } else {
-        lines = [fullText];
-      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px ElectroluxSans_Bold, Electrolux, sans-serif';
 
+      const fullText = premiosActuales[i];
+      const lines = fullText.length > 14 ? splitText(fullText, 14) : [fullText];
       lines.forEach((textLine, idx) => {
         const yOffset = (idx - (lines.length - 1) / 2) * 16;
         ctx.fillText(textLine, centro - 60, yOffset);
@@ -91,37 +104,43 @@ export default function SpinWheel() {
     ctx.restore();
   };
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    dibujar(ctx, 0);
-    containerRef.current.classList.remove("opacity-0", "scale-50");
-  }, []);
+  const splitText = (text, maxLen) => {
+    const words = text.split(' ');
+    let line1 = '';
+    let line2 = '';
+    words.forEach(word => {
+      if ((line1 + word).length <= maxLen) line1 += word + ' ';
+      else line2 += word + ' ';
+    });
+    return [line1.trim(), line2.trim()];
+  };
 
   const girarRuleta = () => {
     if (girando) return;
     setGirando(true);
     setPremioTexto('');
     setConfetiVisible(false);
+    setFinalIndex(null);
 
     sonidoGiro.currentTime = 0;
     sonidoGiro.play();
 
-    // Duración aumentada a 8 segundos
     const duracion = 8000;
-    const vueltas  = 360 * 5;
-    const random   = Math.random() * 360;
-    const destino  = vueltas + random;
-    const inicio   = performance.now();
+    const vueltas = 360 * 5;
+    const randomIndex = Math.floor(Math.random() * segmentos);
+    const anguloSegmento = 360 / segmentos;
+    const offset = -90 - (randomIndex * anguloSegmento + anguloSegmento / 2);
+    const destino = vueltas + offset;
 
-    const animar = (ahora) => {
+    const inicio = performance.now();
+    const animar = ahora => {
       const delta = ahora - inicio;
-      const prog  = Math.min(delta / duracion, 1);
-      const ease  = 1 - Math.pow(1 - prog, 3);
-      const ang   = destino * ease;
+      const prog = Math.min(delta / duracion, 1);
+      const ease = 1 - Math.pow(1 - prog, 3);
+      const ang = destino * ease;
 
-      const ctx = canvasRef.current.getContext("2d");
-      dibujar(ctx, ang);
+      const ctx = canvasRef.current.getContext('2d');
+      dibujar(ctx, ang, premiosAsignados, null);
 
       if (prog < 1) {
         requestAnimationFrame(animar);
@@ -132,13 +151,12 @@ export default function SpinWheel() {
         sonidoFin.play();
 
         setGirando(false);
-        const final = (ang % 360 + 360) % 360;
-        const angSegmento = 360 / segmentos;
-        const index = (segmentos - Math.floor(final / angSegmento)) % segmentos;
-        const premioSeleccionado = premiosAsignados[index];
-
-        setPremioTexto(premioSeleccionado);
+        setFinalIndex(randomIndex);
+        setPremioTexto(premiosAsignados[randomIndex]);
         setConfetiVisible(true);
+
+        const ctxFinal = canvasRef.current.getContext('2d');
+        dibujar(ctxFinal, destino, premiosAsignados, randomIndex);
       }
     };
 
@@ -148,20 +166,43 @@ export default function SpinWheel() {
   return (
     <div
       ref={containerRef}
-      style={{ fontFamily: 'Electrolux, sans-serif' }}
-      className="flex flex-col items-center justify-center min-h-screen bg-dynamic opacity-0 scale-50 transition-all duration-700 ease-out"
+      style={{ fontFamily: 'ElectroluxSans_Bold, Electrolux, sans-serif' }}
+      className="flex flex-col items-center justify-start pt-32 min-h-screen bg-dynamic opacity-0 scale-50 transition-all duration-700 ease-out"
     >
       {confetiVisible && <Confetti />}
+
       <div className="relative flex flex-col items-center bg-white p-8 rounded-3xl shadow-2xl">
+
+        {/* LOGO (sin cambios) */}
+        <img 
+          src={TitleImg}
+          alt="Logo" 
+          className="w-50 mb-6 absolute top-[-12rem] left-1/2 transform -translate-x-1/2 drop-shadow-lg"
+        />
+
+        {/* FLECHA */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: '15px solid transparent',
+              borderRight: '15px solid transparent',
+              borderTop: '25px solid #FF5722',
+              filter: 'drop-shadow(0 0 10px rgba(255,87,34,0.9))'
+            }}
+          />
+        </div>
+
+        {/* CANVAS */}
         <canvas
           ref={canvasRef}
           width={400}
           height={400}
-          className="rounded-full shadow-2xl border-8 border-[#2F3153]"
-          style={{ fontFamily: 'Electrolux, sans-serif' }}
+          className="rounded-full shadow-2xl border-8 border-[#2F3153] mt-8"
         />
 
-        {/* Cuadro emergente con mensaje bonito, centrado */}
+        {/* MENSAJE GANADOR */}
         {premioTexto && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg text-center z-10">
             <h2 className="text-3xl font-bold mb-2 text-green-600">¡Felicidades!</h2>
@@ -169,6 +210,7 @@ export default function SpinWheel() {
           </div>
         )}
 
+        {/* BOTÓN */}
         <button
           onClick={girarRuleta}
           disabled={girando}
