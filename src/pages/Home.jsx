@@ -22,9 +22,6 @@ export default function Home() {
             <span className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur">
               Promoción especial
             </span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white drop-shadow">
-              ¡Súmate al sorteo oficial!
-            </h2>
           </div>
 
           <Formulario />

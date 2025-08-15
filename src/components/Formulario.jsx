@@ -132,9 +132,9 @@ export default function Formulario() {
       aria-describedby={error ? 'form-error' : undefined}
     >
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-semibold text-white drop-shadow-sm">
+        <h2 className="text-2xl font-semibold text-white drop-shadow-sm">
           Participa y gana premios
-        </h1>
+        </h2>
         <p className="text-sm text-white/70">
           Llena tus datos para ingresar al sorteo
         </p>
