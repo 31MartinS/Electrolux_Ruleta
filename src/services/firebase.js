@@ -16,20 +16,19 @@ const firebaseConfig = {
   storageBucket: "spin-wheel-app-35165.firebasestorage.app",
   messagingSenderId: "860062847623",
   appId: "1:860062847623:web:fddde745a462558c3bde22"
-  // OJO: sin measurementId para no cargar Analytics
 }
 
 const app = initializeApp(firebaseConfig)
 
-// Fuerza transporte más compatible (evita bloqueos/redes estrictas)
+// Transporte compatible (redes estrictas / bloqueadores)
 initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true, // usa long-polling si hace falta
-  useFetchStreams: false                   // mejora compatibilidad en Safari/iOS/ciertos proxys
+  experimentalAutoDetectLongPolling: true,
+  useFetchStreams: false
 })
 
 const db = getFirestore(app)
 
-// Guardar participante
+// CREATE
 export async function guardarParticipante({ nombre, cedula, celular, email }) {
   const emailLower = String(email).trim().toLowerCase()
   const ref = doc(db, "participantes", emailLower)
@@ -43,7 +42,7 @@ export async function guardarParticipante({ nombre, cedula, celular, email }) {
   }, { merge: false })
 }
 
-// Asignar premio (solo campo 'premio')
+// UPDATE SOLO 'premio'
 export async function asignarPremio(email, premio) {
   const emailLower = String(email).trim().toLowerCase()
   const ref = doc(db, "participantes", emailLower)
