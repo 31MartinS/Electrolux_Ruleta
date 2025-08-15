@@ -4,22 +4,32 @@ import backgroundImage from '../assets/images/moms.jpg'
 export default function Home() {
   return (
     <div
-      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-auto"
+      className="relative min-h-screen w-full overflow-hidden"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
       }}
     >
       {/* Overlay para contraste */}
-      <div className="absolute inset-0 bg-black/50 z-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
 
-      {/* Contenido principal */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-md p-4">
-        <Formulario />
+      {/* Contenido centrado */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-5xl items-center justify-center px-4">
+        <div className="w-full max-w-lg">
+          {/* Branding opcional / título de la campaña */}
+          <div className="mb-6 text-center">
+            <span className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur">
+              Promoción especial
+            </span>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white drop-shadow">
+              ¡Súmate al sorteo oficial!
+            </h2>
+          </div>
+
+          <Formulario />
+        </div>
       </div>
     </div>
   )
 }
- 

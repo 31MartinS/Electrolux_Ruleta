@@ -7,13 +7,11 @@ function Ruleta() {
   const [premioGanado, setPremioGanado] = useState(null);
 
   const premios = [
-    'Detergente gratis por 6 meses',
-    'Regalo sorpresa',
-    'Aspiradora',
-    'Regalo sorpresa',
-    'Plancha',
-    'Regalo sorpresa',
-    'Regalo sorpresa'
+    "Electromenor",
+    "Detergente",
+    "Regalo sorpresa",
+    "Regalo sorpresa",
+    "Regalo sorpresa",
   ];
 
   const colores = ['#D3DCE1', '#1F2045'];

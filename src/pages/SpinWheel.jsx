@@ -4,14 +4,11 @@ import TitleImg from '../assets/images/Title.png';
 import { asignarPremio } from '../services/firebase';
 
 const premios = [
-  "Medio año de detergente gratis",
+  "Electromenor",
+  "Detergente",
   "Regalo sorpresa",
-  "Aspiradora",
   "Regalo sorpresa",
   "Regalo sorpresa",
-  "Plancha",
-  "Medio año de detergente gratis",
-  "Regalo sorpresa"
 ];
 
 const colores = ["#D3DCE1", "#1F2045"];
